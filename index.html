@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduClip AI - Smart Educational Video Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        nav {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            display: flex;
+            gap: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Upload Section */
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 30px;
+        }
+
+        .upload-area:hover {
+            background: #f8f9fa;
+            border-color: #764ba2;
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Processing Status */
+        .status-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Results Display */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .result-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transform: translateY(-5px);
+        }
+
+        .result-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .clip-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .clip-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .clip-meta {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        .download-btn {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Analytics */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        /* Video Library */
+        .video-list {
+            margin-top: 20px;
+        }
+
+        .video-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .video-item:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .video-info h3 {
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .video-meta {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-complete {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-processing {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Login/Register */
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid #e9ecef;
+            transition: all 0.3s;
+        }
+
+        .auth-tab.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+            }
+
+            .results-grid, .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Authentication -->
+    <div id="authSection" class="auth-container">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">EduClip AI</h2>
+        
+        <div class="auth-tabs">
+            <div class="auth-tab active" onclick="switchAuthTab('login')">Login</div>
+            <div class="auth-tab" onclick="switchAuthTab('register')">Register</div>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" required>
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%;">Login</button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm" class="hidden">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="regUsername" required>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="regEmail" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="regPassword" required>
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <select id="regRole" style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 8px;">
+                    <option value="student">Student</option>
+                    <option value="educator">Educator</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%;">Register</button>
+        </form>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="container hidden">
+        <header>
+            <h1>🎓 EduClip AI</h1>
+            <p>AI-Enhanced Video Editing and Summarization for Educational Content</p>
+        </header>
+
+        <nav>
+            <button class="nav-btn active" onclick="showSection('upload')">📤 Upload Video</button>
+            <button class="nav-btn" onclick="showSection('library')">📚 My Videos</button>
+            <button class="nav-btn" onclick="showSection('analytics')">📊 Analytics</button>
+            <button class="nav-btn" onclick="logout()">🚪 Logout</button>
+        </nav>
+
+        <div class="content">
+            <!-- Upload Section -->
+            <div id="uploadSection" class="section active">
+                <h2 style="margin-bottom: 25px;">Upload Educational Video</h2>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📹</div>
+                    <h3>Drop video here or click to browse</h3>
+                    <p style="color: #6c757d; margin-top: 10px;">Supports MP4, AVI, MOV, MKV</p>
+                    <input type="file" id="videoFile" accept="video/*" style="display: none;">
+                </div>
+
+                <div class="form-group">
+                    <label>Video Title *</label>
+                    <input type="text" id="videoTitle" placeholder="Enter video title">
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="videoDescription" placeholder="Brief description of the video content"></textarea>
+                </div>
+
+                <button class="btn-primary" onclick="uploadVideo()" id="uploadBtn" disabled>
+                    🚀 Start Processing
+                </button>
+
+                <!-- Processing Status -->
+                <div id="processingStatus" class="status-card hidden">
+                    <h3>Processing Status</h3>
+                    <p id="statusMessage">Uploading video...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar" style="width: 0%">0%</div>
+                    </div>
+                    <p style="color: #6c757d; margin-top: 10px;">This may take a few minutes...</p>
+                </div>
+            </div>
+
+            <!-- Library Section -->
+            <div id="librarySection" class="section">
+                <h2 style="margin-bottom: 25px;">My Video Library</h2>
+                <div id="videoList" class="video-list">
+                    <!-- Videos will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="analyticsSection" class="section">
+                <h2 style="margin-bottom: 25px;">Learning Analytics</h2>
+                
+                <div class="analytics-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalVideos">0</div>
+                        <div class="stat-label">Total Videos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalClips">0</div>
+                        <div class="stat-label">Clips Generated</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="watchTime">0h</div>
+                        <div class="stat-label">Watch Time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="completion">0%</div>
+                        <div class="stat-label">Avg Completion</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <h3>Recent Activity</h3>
+                    <div id="recentActivity"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let authToken = null;
+        let currentUser = null;
+        let selectedFile = null;
+        const API_BASE = 'http://localhost:8000/api';
+
+        // Authentication
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (tab === 'login') {
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('registerForm').classList.add('hidden');
+            } else {
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('registerForm').classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({email, password})
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    authToken = data.data.token;
+                    currentUser = data.data;
+                    localStorage.setItem('authToken', authToken);
+                    showMainApp();
+                } else {
+                    alert('Login failed: ' + data.message);
+                }
+            } catch (error) {
+                alert('Login error: ' + error.message);
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const role = document.getElementById('regRole').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username, email, password, role})
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    authToken = data.data.token;
+                    currentUser = data.data;
+                    localStorage.setItem('authToken', authToken);
+                    showMainApp();
+                } else {
+                    alert('Registration failed: ' + data.message);
+                }
+            } catch (error) {
+                alert('Registration error: ' + error.message);
+            }
+        });
+
+        function showMainApp() {
+            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            loadVideos();
+            loadAnalytics();
+        }
+
+        function logout() {
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('authToken');
+            document.getElementById('authSection').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+        }
+
+        // Navigation
+        function showSection(sectionName) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(sectionName + 'Section').classList.add('active');
+            event.target.classList.add('active');
+            
+            if (sectionName === 'library') loadVideos();
+            if (sectionName === 'analytics') loadAnalytics();
+        }
+
+        // File Upload
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('videoFile');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.background = '#f8f9fa';
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.background = '';
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.background = '';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) handleFileSelect(files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) handleFileSelect(e.target.files[0]);
+        });
+
+        function handleFileSelect(file) {
+            if (!file.type.startsWith('video/')) {
+                alert('Please select a video file');
+                return;
+            }
+            selectedFile = file;
+            document.getElementById('uploadBtn').disabled = false;
+            uploadArea.querySelector('h3').textContent = `Selected: ${file.name}`;
+        }
+
+        async function uploadVideo() {
+            if (!selectedFile) {
+                alert('Please select a video file');
+                return;
+            }
+
+            const title = document.getElementById('videoTitle').value;
+            if (!title) {
+                alert('Please enter a video title');
+                return;
+            }
+
+            const description = document.getElementById('videoDescription').value;
+
+            // Show processing status
+            document.getElementById('processingStatus').classList.remove('hidden');
+            document.getElementById('uploadBtn').disabled = true;
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('title', title);
+            formData.append('description', description);
+
+            try {
+                const response = await fetch(`${API_BASE}/videos/upload`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const videoId = data.data.video_id;
+                    monitorProcessing(videoId);
+                } else {
+                    alert('Upload failed: ' + data.message);
+                    resetUploadForm();
+                }
+            } catch (error) {
+                alert('Upload error: ' + error.message);
+                resetUploadForm();
+            }
+        }
+
+        async function monitorProcessing(videoId) {
+            const statusMessages = {
+                'processing': 'Processing video...',
+                'transcribing': 'Transcribing audio...',
+                'analyzing': 'Analyzing content...',
+                'generating_clips': 'Generating clips...',
+                'complete': 'Processing complete!',
+                'failed': 'Processing failed'
+            };
+
+            const interval = setInterval(async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/videos/${videoId}/status`, {
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`
+                        }
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        const status = data.data.status;
+                        const progress = data.data.progress;
+                        
+                        document.getElementById('statusMessage').textContent = statusMessages[status];
+                        document.getElementById('progressBar').style.width = progress + '%';
+                        document.getElementById('progressBar').textContent = progress + '%';
+
+                        if (status === 'complete') {
+                            clearInterval(interval);
+                            setTimeout(() => {
+                                alert('Video processed successfully!');
+                                resetUploadForm();
+                                showSection('library');
+                            }, 1000);
+                        } else if (status === 'failed') {
+                            clearInterval(interval);
+                            alert('Video processing failed');
+                            resetUploadForm();
+                        }
+                    }
+                } catch (error) {
+                    console.error('Status check error:', error);
+                }
+            }, 2000);
+        }
+
+        function resetUploadForm() {
+            document.getElementById('processingStatus').classList.add('hidden');
+            document.getElementById('uploadBtn').disabled = false;
+            document.getElementById('videoTitle').value = '';
+            document.getElementById('videoDescription').value = '';
+            document.getElementById('progressBar').style.width = '0%';
+            selectedFile = null;
+            uploadArea.querySelector('h3').textContent = 'Drop video here or click to browse';
+        }
+
+        async function loadVideos() {
+            try {
+                const response = await fetch(`${API_BASE}/videos`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayVideos(data.data.videos);
+                }
+            } catch (error) {
+                console.error('Load videos error:', error);
+            }
+        }
+
+        function displayVideos(videos) {
+            const videoList = document.getElementById('videoList');
+            
+            if (videos.length === 0) {
+                videoList.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 40px;">No videos yet. Upload your first video!</p>';
+                return;
+            }
+
+            videoList.innerHTML = videos.map(video => `
+                <div class="video-item">
+                    <div class="video-info">
+                        <h3>${video.title}</h3>
+                        <p class="video-meta">Uploaded: ${new Date(video.uploaded_at).toLocaleDateString()}</p>
+                    </div>
+                    <div>
+                        <span class="status-badge status-${video.status === 'complete' ? 'complete' : video.status === 'failed' ? 'failed' : 'processing'}">
+                            ${video.status.toUpperCase()}
+                        </span>
+                        ${video.status === 'complete' ? `<button class="download-btn" style="margin-left: 10px;" onclick="viewResults('${video.video_id}')">View Results</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function viewResults(videoId) {
+            // In a real application, this would navigate to a results page
+            alert('View results for video: ' + videoId);
+        }
+
+        async function loadAnalytics() {
+            // Simulated analytics
+            document.getElementById('totalVideos').textContent = '12';
+            document.getElementById('totalClips').textContent = '48';
+            document.getElementById('watchTime').textContent = '23h';
+            document.getElementById('completion').textContent = '85%';
+        }
+
+        // Check for existing token on page load
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                authToken = token;
+                showMainApp();
+            }
+        });
+    </script>
+</body>
+</html>
